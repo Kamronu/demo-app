@@ -31,22 +31,13 @@ jobs:
         run: |
           docker push ${{ secrets.DOCKER_USERNAME }}/demo-app:$TAG
 
-      - name: Set image tag in k8s files
+      - name: Test application locally
         run: |
-          sed -i "s|DOCKER_USERNAME|${{ secrets.DOCKER_USERNAME }}|g" k8s/deployment.yaml
-          sed -i "s|TAG|$TAG|g" k8s/deployment.yaml
-
-      - name: Set Kubernetes context
-        uses: azure/k8s-set-context@v3
-        with:
-          method: kubeconfig
-          kubeconfig: ${{ secrets.KUBECONFIG }}
-
-      - name: Deploy to Kubernetes
-        uses: azure/k8s-deploy@v4
-        with:
-          manifests: |
-            k8s/deployment.yaml
-            k8s/service.yaml
-            k8s/ingress.yaml
-          namespace: default
+          echo "Запускаем контейнер для тестирования..."
+          docker run -d -p 3000:3000 --name test-app ${{ secrets.DOCKER_USERNAME }}/demo-app:$TAG
+          sleep 5
+          echo "Проверяем ответ приложения..."
+          curl http://localhost:3000
+          echo "Останавливаем и удаляем контейнер..."
+          docker stop test-app
+          docker rm test-app
