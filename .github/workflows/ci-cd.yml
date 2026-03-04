@@ -36,7 +36,7 @@ jobs:
           sed -i "s|DOCKER_USERNAME|${{ secrets.DOCKER_USERNAME }}|g" k8s/deployment.yaml
           sed -i "s|TAG|$TAG|g" k8s/deployment.yaml
 
-            - name: Set Kubernetes context
+      - name: Set Kubernetes context
         uses: azure/k8s-set-context@v3
         with:
           method: kubeconfig
@@ -50,6 +50,3 @@ jobs:
             k8s/service.yaml
             k8s/ingress.yaml
           namespace: default
-            k8s/service.yaml
-            k8s/ingress.yaml
-          kubeconfig: ${{ secrets.KUBECONFIG }}
